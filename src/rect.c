@@ -52,10 +52,6 @@ void GLF_CreateText(GLF_Rect* rect, char* str, bool centered)
     {
         textSurface->w--;
     }
-    if (!strcmp(str, "F11: Fullscreen (can crash)"))
-    {
-        textSurface->w+=2;
-    }
 
     int len = (float)strlen(str);
     rect->text->w = textSurface->w * (len+1)/len;

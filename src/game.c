@@ -366,18 +366,12 @@ int game_rendering(void* data)
 	{
 		if (gameData->reload)
 		{
-			SDL_LockMutex(listMutex);
+			int x, y;
+			SDL_GetWindowSize(window, &x, &y);
+			ASPECT_RATIO = (float)x/(float)y;
+			glViewport(0, 0, x, y);
 
-			SDL_GL_DeleteContext(GL);
-			InitGL();
-
-			GameObj* savell = objs->player->next;
-			InitGui(objs);
-			objs->player->next = savell;
-			objs->player->next->prev = objs->player;
 			gameData->reload = false;
-
-			SDL_UnlockMutex(listMutex);
 		}
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

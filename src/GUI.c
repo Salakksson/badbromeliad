@@ -133,7 +133,7 @@ void InitGui(SET* objs)
 
     objs->text[objs->menuTextCount] = GLF_CreateRect(0, 0, 0, 0);
 	objs->text[objs->menuTextCount]->y = text_pos;
-    GLF_CreateText(objs->text[objs->menuTextCount], "F11: Fullscreen (can crash)", true);
+    GLF_CreateText(objs->text[objs->menuTextCount], "F11: Fullscreen", true);
     objs->text[objs->menuTextCount]->text->fontSize = 0.06;
     text_pos -= objs->text[objs->menuTextCount]->text->fontSize*2;
     objs->menuTextCount++;
