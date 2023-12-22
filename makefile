@@ -16,6 +16,8 @@ $(TARGET): $(OBJS) $(DIR_BUILD)/main.o
 
 $(DIR_BUILD)/%.o: $(DIR_SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
+	@cp ./game release
+	@cp -r ./assets release
 
 .PHONY: clean
 
