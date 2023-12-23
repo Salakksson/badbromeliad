@@ -2,7 +2,7 @@
 
 bool* B_FPS;
 bool* B_MENU;
-
+unsigned int* B_DEAD;
 
 void Render_DrawText(GLF_Text* text)
 {
@@ -56,7 +56,7 @@ void GLF_DrawRect(GLF_Rect* rect)
     glLoadIdentity();
     glTranslatef(rect->x, rect->y, 0.0f);
     
-    if (rect->text->text) 
+    if (*rect->text->text) 
     {
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -148,6 +148,8 @@ void Render_ScreenDraw(SET* objs)
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    
     GameObj* obj = objs->player;
     while(obj)
     {
@@ -174,11 +176,7 @@ void Render_ScreenDraw(SET* objs)
         {
             glColor3f(1.0f, 1.0f, 1.0f);
             GLF_DrawRect(objs->text[i]);
-        }
-
-        
-        
-        
+        } 
     }
     if(*B_FPS)
     {
@@ -191,6 +189,15 @@ void Render_ScreenDraw(SET* objs)
         GLF_DrawRect(objs->hearts[i]);
     }
     
+    if (*B_DEAD)
+    {
+        glColor3f(1.0f, 1.0f, 1.0f);
+        GLF_DrawRect(objs->death);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        GLF_DrawRect(objs->deathtext);
+    }
+    glColor3f(1.0f, 1.0f, 1.0f);
+    GLF_DrawRect(objs->round);
 
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);

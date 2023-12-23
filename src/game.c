@@ -4,6 +4,13 @@
 bool quit;
 bool INIT = false;
 
+int enemiesOnRound(int round)
+{
+	double enemies = (round*log10(round)+2) + 10;
+
+	return (int)enemies;
+}
+
 int msPerSpawn(int round)//, float updateTime)
 {
 	double spawnTime = 3000/(round*log10(round)+2);
@@ -15,19 +22,6 @@ int msPerSpawn(int round)//, float updateTime)
 float q_rsqrt(float number)
 {
 	return 1/sqrt(number);
-	long i;
-	float x2, y;
-	const float threehalfs = 1.5F;
-
-	x2 = number * 0.5F;
-	y  = number;
-	i  = * ( long * ) &y;                       // evil floating point bit level hacking
-	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
-	y  = * ( float * ) &i;
-	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-	// y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
-
-	return y;
 }
 
 int game_main(void* data)
@@ -37,7 +31,7 @@ int game_main(void* data)
 	
 	for(;!INIT;);			// Best line of code ever written
 	/*
-		This line stalls the cpu untill INIT is set to true (after the ui struct is initialised in the rendering thread)
+		This line stalls the cpu until INIT is set to true (after the ui struct is initialised in the rendering thread)
 		This saves extra checks later in the loop and slightly increases performance
 		This is also just a beautiful line of code in its own right
 
@@ -48,10 +42,11 @@ int game_main(void* data)
 	clock_t prev = current; 
 	clock_t lastSpawnClock = current; 
 	int round = 1;
-
+	int lives = 3;
 	GameObj* firstObj = objs->enemies;
-	GameObj* lastObj = firstObj;
 
+	int roundwait = 3;
+	int enemyCount = enemiesOnRound(round);
 
 	float UpdateTime = 1000/60;
 
@@ -110,7 +105,7 @@ int game_main(void* data)
 					float myf = -((float)my/(float)wh)*2 +1;
 					bool onBoxX = inRangef(objs->slider->x - objs->slider->w/2, objs->slider->x + objs->slider->w/2, mxf);
 					bool onBoxY = inRangef(objs->slider->y - objs->slider->h/2, objs->slider->y + objs->slider->h/2, myf);
-					if (onBoxX && onBoxY)
+					if (onBoxX && onBoxY && !*B_MENU)
 					{
 						objs->slider->value = (mxf - objs->slider->x + objs->slider->w/2) / (objs->slider->w);
 					}
@@ -119,7 +114,6 @@ int game_main(void* data)
 						objs->player->model->textureID++;
 						objs->player->model->data[0] = 2*RELOAD_TIME / UpdateTime;
 
-						
 						GameObj* scan_lastobj = NULL;
 						GameObj* scan_obj = objs->player;
 						while(scan_obj)
@@ -177,14 +171,24 @@ int game_main(void* data)
 
 		float enemySpeed = 1.0f / 200.0f;
 
-		if (lastSpawn / 2>= msPerSpawn(round))
+		if (lastSpawn / 2 >= msPerSpawn(round) && !roundwait)
 		{
 			//printf("%d\n", msPerSpawn(round));
 			lastSpawnClock = current;
-			if (*B_MENU)
+			if (*B_MENU || *B_DEAD)
 				goto event;	// pause
-
 			
+			enemyCount--;
+			if (!enemyCount)
+			{
+				enemyCount = enemiesOnRound(round);
+				roundwait = 5000/UpdateTime;
+				round++;
+				snprintf(objs->round->text->text, 15, "Round %d", round);
+				printf("%s\n", objs->round->text->text);
+				GLF_CreateText(objs->round, objs->round->text->text, false);
+				printf("here\n");
+			}
 
 			GameObj* obj;
 			for (obj = objs->enemies; obj->next != NULL; obj = obj->next);
@@ -212,16 +216,38 @@ int game_main(void* data)
 			obj->next->dx = dx * enemySpeed * normal * ASPECT_RATIO;
 			obj->next->dy = dy * enemySpeed * normal;
 			
-
-
 		}
+
 		if (ms >= UpdateTime)	// Constantly timed calls
 		{
 			srand(current);
 			prev = current; 
-			if (*B_MENU)
-				goto event;	// pause
 			
+			
+			    if (*B_DEAD)
+				{
+					*B_DEAD-=1;
+					if(!*B_DEAD)
+					{
+						objs->hearts[0]->textureID--;
+						objs->hearts[1]->textureID--;
+						objs->hearts[2]->textureID--;
+						GameObj* obj = objs->enemies->next;
+						while(obj)
+						{
+							GameObj* next = obj->next;
+							freeObj(obj);
+							obj = next;
+						} 
+					}
+				}
+
+			if (roundwait)
+			{
+				roundwait--;
+			}
+			if (*B_MENU || *B_DEAD)
+				goto event;	// pause
 
 			if(input[SDL_SCANCODE_W])
 				objs->player->dy = fminf(objs->player->dy + PLAYER_ACCEL, PLAYER_MAXSPEED);
@@ -249,6 +275,7 @@ int game_main(void* data)
 			obj = objs->enemies->next;
 			while(obj)
 			{
+				loop:
 				obj->model->x += obj->dx / ASPECT_RATIO;
 				obj->model->y += obj->dy;
 				GameObj* next = obj->next;
@@ -264,12 +291,31 @@ int game_main(void* data)
 				{
 					freeObj(obj); 
 					obj = NULL;
+					obj = next;
+					goto loop;
+				}
+				if (inRangef(objs->player->model->x, objs->player->model->x+objs->player->model->w, obj->model->x+obj->model->w/2) && 
+					inRangef(objs->player->model->y, objs->player->model->y+objs->player->model->h, obj->model->y+obj->model->h/2))
+				{
+					lives--;
+					if (!lives)
+					{
+						objs->hearts[lives]->textureID++;
+						*B_DEAD = 1000;
+						printf("Dead\n");
+						lives = 3;
+					}
+					else
+						objs->hearts[lives]->textureID++;
+					freeObj(obj); 
+					obj = NULL;
+					obj = next;
+					goto loop;
 				}
 				GameObj* bullet = objs->player->next;
 				while(bullet)
 				{
 					GameObj* next = bullet->next;
-
 					if (inRangef(bullet->model->x, bullet->model->x + bullet->model->w, obj->model->x + obj->model->w/2) && inRangef(bullet->model->y, bullet->model->y + bullet->model->h, obj->model->y + obj->model->h/2))
 					{
 						freeObj(obj); 
@@ -277,7 +323,7 @@ int game_main(void* data)
 						freeObj(bullet); 
 						bullet = NULL;
 					}
-					bullet = next;
+					else bullet = next;
 				}
 				obj = next;
 			}
@@ -354,11 +400,12 @@ int game_rendering(void* data)
 	B_MENU = calloc(1, 1);
 	*B_MENU = true;
 
+	B_DEAD = calloc(1, sizeof(*B_DEAD));
 
 	InitGui(objs);
 
-	INIT = true; false;
-	
+	INIT = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
+
 	int frames = 0;
 	clock_t prev = clock(); 
     clock_t current = clock(); 
@@ -384,16 +431,15 @@ int game_rendering(void* data)
 
 		current = clock(); 
 		frames++;
-		if ((current - prev) / CLOCKS_PER_SEC)
+		if (((current - prev) / CLOCKS_PER_SEC) >= 1)
 		{
 			prev = current;
-			sprintf(objs->FPS->text->text, "FPS: %d", frames);
+			snprintf(objs->FPS->text->text, 15, "FPS: %d", frames);
 			GLF_CreateText(objs->FPS, objs->FPS->text->text, false);
 			frames = 0;
 		}
 		
     }
 
-	// Free booleans
     return 0;
 }

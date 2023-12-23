@@ -48,15 +48,26 @@ void InitGui(SET* objs)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+    GLuint Texture_Death = SOIL_load_OGL_texture(ASSETS_DIRECTORY "bheart.png", SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     objs->BG = GLF_CreateRect(-1, -1, 2, 2 * ASPECT_RATIO);
 	objs->BG->textureID = Texture_BG;
+
+    objs->death = GLF_CreateRect(-0.5, -0.5 * ASPECT_RATIO , 1, 1 * ASPECT_RATIO);
+    objs->death->textureID = Texture_Death;
+
+    objs->deathtext = GLF_CreateRect(0, 0.6, 0, 0);
+    GLF_CreateText(objs->deathtext, "You Died! Game will restart shortly", true);
+    objs->deathtext->text->fontSize = 0.15;
 
     objs->hearts[0] = GLF_CreateRect(0.7, 1-0.1*ASPECT_RATIO , 0.1, 0.1 * ASPECT_RATIO);
 	objs->hearts[0]->textureID = Texture_Heart;
     objs->hearts[1] = GLF_CreateRect(0.8, 1-0.1*ASPECT_RATIO , 0.1, 0.1 * ASPECT_RATIO);
-	objs->hearts[1]->textureID = Texture_bHeart;
+	objs->hearts[1]->textureID = Texture_Heart;
     objs->hearts[2] = GLF_CreateRect(0.9, 1-0.1*ASPECT_RATIO , 0.1, 0.1 * ASPECT_RATIO);
-	objs->hearts[2]->textureID = Texture_bHeart;
+	objs->hearts[2]->textureID = Texture_Heart;
 
     objs->player = createObj(-(PLAYER_SIZE / ASPECT_RATIO) /2, -PLAYER_SIZE/2, PLAYER_SIZE / ASPECT_RATIO, PLAYER_SIZE, Texture_Ananas, NULL);
     objs->player->model->angle = 0;
@@ -69,7 +80,6 @@ void InitGui(SET* objs)
 
     objs->GuiBox = GLF_CreateRect(-0.5, -0.5*ASPECT_RATIO, 1, ASPECT_RATIO);
     objs->GuiBox->textureID = Texture_Menu;
-	//objs->GuiBox->text = "GUI";
     
     objs->text = malloc(sizeof(objs->text) * 20);
     float o_text_pos = objs->GuiBox->y + (objs->GuiBox->h * 0.8);
@@ -149,9 +159,14 @@ void InitGui(SET* objs)
 	objs->slider->y = text_pos;
     objs->slider->value = 0.5;
     
+    objs->round = GLF_CreateRect(-1, 0, 0, 0);
+    objs->round->text->fontSize = 0.2;
+	objs->round->y = 1 - objs->round->text->fontSize;
+    GLF_CreateText(objs->round, "Round 1", false);
+    
 
     objs->FPS = GLF_CreateRect(-1, 0, 0, 0);
-	objs->FPS->y = 1 - objs->FPS->text->fontSize;
-    GLF_CreateText(objs->FPS, malloc(10), false);
+	objs->FPS->y = 0.8 - objs->FPS->text->fontSize;
+    GLF_CreateText(objs->FPS, "FPS: 0", false);
     objs->FPS->data = (uint32_t*)calloc(1, 1);
 }

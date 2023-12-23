@@ -12,7 +12,6 @@ GLF_Rect* GLF_CreateRect(float x, float y, float w, float h)
     rect->colour[1] = 0;
     rect->colour[2] = 255;
     rect->text->fontSize = 0.08;
-    rect->text->text = NULL;
     rect->text->textureID = 0;
     rect->angle = 0;
     return rect;
@@ -33,7 +32,7 @@ void GLF_CreateText(GLF_Rect* rect, char* str, bool centered)
     {
         glDeleteTextures(1, &rect->text->textureID);
     }
-    rect->text->text = str;
+    strcpy(rect->text->text, str);
     SDL_Color textColor = {255, 255, 255, 255};
     SDL_Surface* textSurface = TTF_RenderText_Blended(font, str, textColor);
     

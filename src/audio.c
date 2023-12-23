@@ -2,7 +2,7 @@
 #include "audio.h"
 
 extern bool quit;
-
+extern bool INIT;
 int audio_music(void* data)
 {
     //return zero;
@@ -15,6 +15,7 @@ int audio_music(void* data)
 
     Mix_PlayMusic(beginning, 0);
 
+    for(;!INIT;);			// Best line of code ever written
 
     while (Mix_PlayingMusic())
     {

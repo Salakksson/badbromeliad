@@ -1,5 +1,5 @@
 CC         	= gcc
-CFLAGS		= -Wall -I/usr/include -I/usr/include/x86_64-linux-gnu
+CFLAGS		= -Wall -I/usr/include -I/usr/include/x86_64-linux-gnu -O0 -g
 LDFLAGS		= -lSDL2main -lSDL2 -lGL -lSDL2_mixer -lSOIL -lSDL2_ttf -lm
 
 

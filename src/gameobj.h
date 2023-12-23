@@ -19,9 +19,7 @@ typedef struct
 
     
     GameObj* player;
-    
-   
-
+    GameObj* enemies;
     GLF_Rect* GuiBox;
     GLF_Rect** text;
     int menuTextCount;
@@ -30,10 +28,13 @@ typedef struct
 
     GLF_Rect* FPS;
 
-    GameObj* enemies;
-
     GLF_Rect* hearts[3];
 
+    GLF_Rect* deathtext;
+
+    GLF_Rect* death;
+    
+    GLF_Rect* round;
 } SET;
 
 GameObj* createObj(float x, float y, float w, float h, GLuint textureID, GameObj* prev);

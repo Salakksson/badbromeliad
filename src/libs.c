@@ -93,14 +93,12 @@ void InitGL()
     fprintf(stderr, "Error creating OpenGL context: %s\n", SDL_GetError());
     // Handle error appropriately (e.g., exit the program)
 	}
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, true);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
 	SDL_GL_SetSwapInterval(0);
 	
-
 	int x, y;
 	SDL_GetWindowSize(window, &x, &y);
 	ASPECT_RATIO = (float)x/(float)y;

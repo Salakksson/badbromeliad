@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    char* text;
+    char text[20];
     GLuint textureID;
     float fontSize;
     int w;

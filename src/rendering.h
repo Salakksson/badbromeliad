@@ -26,6 +26,7 @@ typedef struct
 
 extern bool* B_FPS;
 extern bool* B_MENU;
+extern unsigned int* B_DEAD;
 
 void Render_DrawText(GLF_Text* text);
 
