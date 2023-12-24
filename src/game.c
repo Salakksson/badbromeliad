@@ -56,6 +56,7 @@ int game_main(void* data)
     while (!quit)
     {	
 		event:
+		mouse1 = mouse1;
         SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
@@ -178,16 +179,19 @@ int game_main(void* data)
 			if (*B_MENU || *B_DEAD)
 				goto event;	// pause
 			
+			if (enemyCount == enemiesOnRound(round))
+			{
+				snprintf(objs->round->text->text, 15, "Round %d", round);
+				printf("%s\n", objs->round->text->text);
+				GLF_CreateText(objs->round, objs->round->text->text, false);
+			}
 			enemyCount--;
 			if (!enemyCount)
 			{
 				enemyCount = enemiesOnRound(round);
-				roundwait = 5000/UpdateTime;
+				roundwait = (int)(10000.0f/UpdateTime);
 				round++;
-				snprintf(objs->round->text->text, 15, "Round %d", round);
-				printf("%s\n", objs->round->text->text);
-				GLF_CreateText(objs->round, objs->round->text->text, false);
-				printf("here\n");
+				
 			}
 
 			GameObj* obj;

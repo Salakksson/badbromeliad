@@ -163,7 +163,6 @@ void InitGui(SET* objs)
     objs->round->text->fontSize = 0.2;
 	objs->round->y = 1 - objs->round->text->fontSize;
     GLF_CreateText(objs->round, "Round 1", false);
-    
 
     objs->FPS = GLF_CreateRect(-1, 0, 0, 0);
 	objs->FPS->y = 0.8 - objs->FPS->text->fontSize;

@@ -14,7 +14,7 @@ OBJS        = $(filter-out $(DIR_BUILD)/main.o, $(patsubst $(DIR_SRC)/%.c, $(DIR
 
 # WASM flags
 #CC          = emcc
-#LDFLAGS     = -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -s USE_SDL_MIXER=2 -s USE_SDL_TTF=2 -s USE_GLFW=3 --preload-file assets ./libs/SOIL.so
+#LDFLAGS     = -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -s USE_SDL_MIXER=2 -s USE_SDL_TTF=2 -s USE_GLFW=3 --preload-file assets ./libs/SOIL.so -s USE_WEBGL2=1
 #DIR_BUILD   = ./webbin
 #TARGET      = game.html
 
